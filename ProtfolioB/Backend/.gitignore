@@ -1,0 +1,18 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Environment
+.env
+
+# Django
+db.sqlite3
+media/
+
+# Node
+node_modules/
+frontend/dist/
+
+# Vercel
+.vercel/
