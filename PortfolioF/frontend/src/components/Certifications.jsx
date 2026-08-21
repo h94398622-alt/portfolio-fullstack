@@ -26,7 +26,9 @@ import AddIcon from "@mui/icons-material/Add";
 const ADMIN_USERNAME = "hiba_abdul";
 const ADMIN_PASSWORD = "hiba695027";
 
-const API_URL = "http://127.0.0.1:8000/api/certifications/";
+// const API_URL = "http://127.0.0.1:8000/api/certifications/";
+
+const API_URL = "https://portfolio-fullstack-ahz1.onrender.com/api/certifications/";
 
 function Certifications() {
   const [certificationsList, setCertificationsList] = useState([]);

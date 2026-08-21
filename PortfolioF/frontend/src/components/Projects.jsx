@@ -64,7 +64,8 @@ function Projects() {
           } else {
             const baseURL = API.defaults.baseURL
               ? API.defaults.baseURL.replace("/api/", "")
-              : "http://127.0.0.1:8000";
+              // : "http://127.0.0.1:8000";
+              : "https://portfolio-fullstack-ahz1.onrender.com";
             finalImageUrl =
               baseURL + (rawImage.startsWith("/") ? rawImage : "/" + rawImage);
           }

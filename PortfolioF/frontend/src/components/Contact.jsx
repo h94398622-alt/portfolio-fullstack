@@ -76,7 +76,8 @@ function Contact() {
   const fetchContactInfo = async () => {
     try {
       const response = await axios.get(
-        "http://127.0.0.1:8000/api/contact-info/",
+        // "http://127.0.0.1:8000/api/contact-info/",
+        "https://portfolio-fullstack-ahz1.onrender.com/api/contact-info/",
       );
       if (response.data) {
         const dataToSet = Array.isArray(response.data)
@@ -130,13 +131,18 @@ function Contact() {
 
       try {
         response = await axios.put(
-          `http://127.0.0.1:8000/api/contact-info/${contactId}/`,
+          // `http://127.0.0.1:8000/api/contact-info/${contactId}/`,
+
+          `https://portfolio-fullstack-ahz1.onrender.com/api/contact-info/${contactId}/`,
+
           editFormData,
         );
       } catch (putError) {
         if (putError.response && putError.response.status === 404) {
           response = await axios.post(
-            `http://127.0.0.1:8000/api/contact-info/`,
+            // `http://127.0.0.1:8000/api/contact-info/`,
+
+            `https://portfolio-fullstack-ahz1.onrender.com/api/contact-info/`,
 
             editFormData,
           );
@@ -182,7 +188,9 @@ function Contact() {
 
     try {
       const response = await axios.post(
-        "http://127.0.0.1:8000/api/contact/",
+        // "http://127.0.0.1:8000/api/contact/",
+
+        "https://portfolio-fullstack-ahz1.onrender.com/api/contact/",
 
         formData,
       );
