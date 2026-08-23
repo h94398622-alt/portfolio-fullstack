@@ -91,12 +91,75 @@ class CertificationViewSet(viewsets.ModelViewSet):
 
 
 # Contact API
+# class ContactCreateView(generics.CreateAPIView):
+#     queryset = Contact.objects.all()
+#     serializer_class = ContactSerializer
+
+#     def create(self, request, *args, **kwargs):
+
+#         serializer = self.get_serializer(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+
+#         contact = serializer.save()
+
+#         try:
+#             msg = EmailMessage()
+
+#             msg["Subject"] = f"Portfolio Contact : {contact.subject}"
+#             msg["From"] = settings.EMAIL_HOST_USER
+#             msg["To"] = settings.EMAIL_HOST_USER
+#             msg["Reply-To"] = contact.email
+
+#             msg.set_content(
+#                 f"""
+# New Portfolio Contact Message
+
+# Name: {contact.name}
+
+# Email: {contact.email}
+
+# Subject: {contact.subject}
+
+# Message:
+
+# {contact.message}
+# """
+#             )
+
+#             server = smtplib.SMTP("smtp.gmail.com", 587)
+#             server.starttls()
+
+#             server.login(
+#                 settings.EMAIL_HOST_USER,
+#                 settings.EMAIL_HOST_PASSWORD,
+#             )
+
+#             server.send_message(msg)
+#             server.quit()
+
+#             return Response(
+#                 {"message": "Message sent successfully."},
+#                 status=status.HTTP_201_CREATED,
+#             )
+
+#         except Exception as e:
+#             print("Email Error:", str(e))
+
+#             return Response(
+#                 {
+#                     "message": "Message could not be sent.",
+#                     "error": str(e),
+#                 },
+#                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+#             )
+
+
+
 class ContactCreateView(generics.CreateAPIView):
     queryset = Contact.objects.all()
     serializer_class = ContactSerializer
 
     def create(self, request, *args, **kwargs):
-
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -105,7 +168,7 @@ class ContactCreateView(generics.CreateAPIView):
         try:
             msg = EmailMessage()
 
-            msg["Subject"] = f"Portfolio Contact : {contact.subject}"
+            msg["Subject"] = f"Portfolio Contact: {contact.subject}"
             msg["From"] = settings.EMAIL_HOST_USER
             msg["To"] = settings.EMAIL_HOST_USER
             msg["Reply-To"] = contact.email
@@ -115,13 +178,10 @@ class ContactCreateView(generics.CreateAPIView):
 New Portfolio Contact Message
 
 Name: {contact.name}
-
 Email: {contact.email}
-
 Subject: {contact.subject}
 
 Message:
-
 {contact.message}
 """
             )
@@ -138,22 +198,26 @@ Message:
             server.quit()
 
             return Response(
-                {"message": "Message sent successfully."},
+                {
+                    "message": "Message sent successfully."
+                },
                 status=status.HTTP_201_CREATED,
             )
 
         except Exception as e:
             print("Email Error:", str(e))
 
+            # Contact database-il save aayittund.
+            # Email fail aayalum API 500 kodukkilla.
             return Response(
                 {
-                    "message": "Message could not be sent.",
-                    "error": str(e),
+                    "message": "Message saved successfully, but email could not be sent.",
+                    "contact_id": contact.id,
                 },
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                status=status.HTTP_201_CREATED,
             )
 
-
+        
 # Skills API
 class SkillListView(generics.ListAPIView):
     queryset = Skill.objects.all()
