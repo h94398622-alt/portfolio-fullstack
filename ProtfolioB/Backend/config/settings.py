@@ -301,3 +301,13 @@ DEFAULT_FROM_EMAIL = os.environ.get(
 # =========================================================
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+
+CORS_ALLOWED_ORIGINS = [
+    "https://portfolio-frontend-weld-pi.vercel.app",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://portfolio-frontend-weld-pi.vercel.app",
+]
