@@ -31,7 +31,7 @@ load_dotenv(BASE_DIR / ".env")
 
 SECRET_KEY = os.environ.get(
     "SECRET_KEY",
-    "django-insecure-development-key-change-in-production"
+    "django-insecure-development-key-change-in-production",
 )
 
 DEBUG = os.environ.get("DEBUG", "True").lower() == "true"
@@ -53,6 +53,7 @@ ALLOWED_HOSTS = [
 # =========================================================
 
 INSTALLED_APPS = [
+    # Django apps
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -60,7 +61,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 
-    # Third party
+    # Third-party apps
     "rest_framework",
     "corsheaders",
 
@@ -75,10 +76,14 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+
+    # CORS middleware MUST be before CommonMiddleware
     "corsheaders.middleware.CorsMiddleware",
+
+    "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
-    "django.contrib.sessions.middleware.SessionMiddleware",
+
     "django.middleware.csrf.CsrfViewMiddleware",
 
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -111,9 +116,7 @@ TEMPLATES = [
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.request",
-
                 "django.contrib.auth.context_processors.auth",
-
                 "django.contrib.messages.context_processors.messages",
             ],
         },
@@ -134,7 +137,6 @@ WSGI_APPLICATION = "config.wsgi.application"
 
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
-
 if DATABASE_URL:
     DATABASES = {
         "default": dj_database_url.parse(
@@ -143,7 +145,6 @@ if DATABASE_URL:
             ssl_require=True,
         )
     }
-
 else:
     DATABASES = {
         "default": {
@@ -207,7 +208,10 @@ STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 
-# WhiteNoise configuration
+# =========================================================
+# WHITENOISE
+# =========================================================
+
 STATICFILES_STORAGE = (
     "whitenoise.storage.CompressedManifestStaticFilesStorage"
 )
@@ -223,22 +227,17 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 
 # =========================================================
-# CORS
+# CORS CONFIGURATION
 # =========================================================
 
 CORS_ALLOWED_ORIGINS = [
-    
+    # Local frontend
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+
+    # Vercel frontend
     "https://portfolio-frontend-weld-pi.vercel.app",
 ]
-
-
-# Add Vercel frontend URL from environment variable
-FRONTEND_URL = os.environ.get("FRONTEND_URL")
-
-if FRONTEND_URL:
-    CORS_ALLOWED_ORIGINS.append(FRONTEND_URL)
 
 
 # =========================================================
@@ -246,12 +245,13 @@ if FRONTEND_URL:
 # =========================================================
 
 CSRF_TRUSTED_ORIGINS = [
+    # Local frontend
     "http://localhost:5173",
+    "http://127.0.0.1:5173",
+
+    # Vercel frontend
+    "https://portfolio-frontend-weld-pi.vercel.app",
 ]
-
-
-if FRONTEND_URL:
-    CSRF_TRUSTED_ORIGINS.append(FRONTEND_URL)
 
 
 # =========================================================
@@ -282,12 +282,12 @@ EMAIL_USE_SSL = False
 
 EMAIL_HOST_USER = os.environ.get(
     "EMAIL_HOST_USER",
-    "fathimahibakarumbil@gmail.com"
+    "fathimahibakarumbil@gmail.com",
 )
 
 EMAIL_HOST_PASSWORD = os.environ.get(
     "EMAIL_HOST_PASSWORD",
-    "spvb fqff goje srbb"
+    "spvb fqff goje srbb",
 )
 
 DEFAULT_FROM_EMAIL = os.environ.get(
@@ -301,13 +301,3 @@ DEFAULT_FROM_EMAIL = os.environ.get(
 # =========================================================
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-
-
-CORS_ALLOWED_ORIGINS = [
-    "https://portfolio-frontend-weld-pi.vercel.app",
-]
-
-CSRF_TRUSTED_ORIGINS = [
-    "https://portfolio-frontend-weld-pi.vercel.app",
-]
