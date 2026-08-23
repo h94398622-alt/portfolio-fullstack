@@ -165,59 +165,13 @@ class ContactCreateView(generics.CreateAPIView):
 
         contact = serializer.save()
 
-        try:
-            msg = EmailMessage()
-
-            msg["Subject"] = f"Portfolio Contact: {contact.subject}"
-            msg["From"] = settings.EMAIL_HOST_USER
-            msg["To"] = settings.EMAIL_HOST_USER
-            msg["Reply-To"] = contact.email
-
-            msg.set_content(
-                f"""
-New Portfolio Contact Message
-
-Name: {contact.name}
-Email: {contact.email}
-Subject: {contact.subject}
-
-Message:
-{contact.message}
-"""
-            )
-
-            server = smtplib.SMTP("smtp.gmail.com", 587)
-            server.starttls()
-
-            server.login(
-                settings.EMAIL_HOST_USER,
-                settings.EMAIL_HOST_PASSWORD,
-            )
-
-            server.send_message(msg)
-            server.quit()
-
-            return Response(
-                {
-                    "message": "Message sent successfully."
-                },
-                status=status.HTTP_201_CREATED,
-            )
-
-        except Exception as e:
-            print("Email Error:", str(e))
-
-            # Contact database-il save aayittund.
-            # Email fail aayalum API 500 kodukkilla.
-            return Response(
-                {
-                    "message": "Message saved successfully, but email could not be sent.",
-                    "contact_id": contact.id,
-                },
-                status=status.HTTP_201_CREATED,
-            )
-
-        
+        return Response(
+            {
+                "message": "Contact saved successfully.",
+                "id": contact.id,
+            },
+            status=status.HTTP_201_CREATED,
+        )
 # Skills API
 class SkillListView(generics.ListAPIView):
     queryset = Skill.objects.all()
