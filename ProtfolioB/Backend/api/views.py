@@ -1,5 +1,6 @@
-import smtplib
-from email.message import EmailMessage
+# import smtplib
+# from email.message import EmailMessage
+import resend
 
 from django.conf import settings
 from rest_framework import generics, status, viewsets
@@ -104,25 +105,17 @@ class ContactCreateView(generics.CreateAPIView):
         # Save contact to database
         contact = serializer.save()
 
-        server = None
-
         try:
-            # Create email
-            msg = EmailMessage()
+            # Resend API key
+            resend.api_key = settings.RESEND_API_KEY
 
-            msg["Subject"] = f"Portfolio Contact: {contact.subject}"
-
-            # Your Gmail address
-            msg["From"] = settings.EMAIL_HOST_USER
-
-            # Send email to your Gmail
-            msg["To"] = settings.EMAIL_HOST_USER
-
-            # When you reply, it will go directly to visitor
-            msg["Reply-To"] = contact.email
-
-            msg.set_content(
-                f"""
+            # Email content
+            email_params = {
+                "from": settings.RESEND_FROM_EMAIL,
+                "to": [settings.RESEND_TO_EMAIL],
+                "subject": f"Portfolio Contact: {contact.subject}",
+                "reply_to": contact.email,
+                "text": f"""
 New Portfolio Contact Message
 
 Name: {contact.name}
@@ -132,29 +125,14 @@ Subject: {contact.subject}
 
 Message:
 {contact.message}
-"""
-            )
+""",
+            }
 
-            # Connect to Gmail SMTP
-            server = smtplib.SMTP(
-                settings.EMAIL_HOST,
-                int(settings.EMAIL_PORT),
-                timeout=30,
-            )
-
-            # Start TLS
-            server.starttls()
-
-            # Login using Gmail App Password
-            server.login(
-                settings.EMAIL_HOST_USER,
-                settings.EMAIL_HOST_PASSWORD,
-            )
-
-            # Send email
-            server.send_message(msg)
+            # Send email using Resend API
+            response = resend.Emails.send(email_params)
 
             print("EMAIL SENT SUCCESSFULLY")
+            print("RESEND RESPONSE:", response)
 
             return Response(
                 {
@@ -165,25 +143,16 @@ Message:
             )
 
         except Exception as e:
-            print("EMAIL ERROR:", repr(e))
+            print("RESEND EMAIL ERROR:", repr(e))
 
-            # Contact is already saved in database.
-            # Email failure should NOT make API return 500.
+            # Contact is already saved in database
             return Response(
                 {
                     "message": "Message saved, but email could not be sent.",
                     "id": contact.id,
                 },
-                status=status.HTTP_201_CREATED,
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
-
-        finally:
-            # Safely close SMTP connection
-            if server is not None:
-                try:
-                    server.quit()
-                except Exception:
-                    pass
 
 # Skills API
 class SkillListView(generics.ListAPIView):
