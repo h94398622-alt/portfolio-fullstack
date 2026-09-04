@@ -92,7 +92,6 @@ class CertificationViewSet(viewsets.ModelViewSet):
 
 
 # Contact API
-
 # Contact API
 class ContactCreateView(generics.CreateAPIView):
     queryset = Contact.objects.all()
@@ -105,13 +104,21 @@ class ContactCreateView(generics.CreateAPIView):
         # Save contact to database
         contact = serializer.save()
 
+        server = None
+
         try:
             # Create email
             msg = EmailMessage()
 
             msg["Subject"] = f"Portfolio Contact: {contact.subject}"
+
+            # Your Gmail address
             msg["From"] = settings.EMAIL_HOST_USER
+
+            # Send email to your Gmail
             msg["To"] = settings.EMAIL_HOST_USER
+
+            # When you reply, it will go directly to visitor
             msg["Reply-To"] = contact.email
 
             msg.set_content(
@@ -132,8 +139,10 @@ Message:
             server = smtplib.SMTP(
                 settings.EMAIL_HOST,
                 int(settings.EMAIL_PORT),
+                timeout=30,
             )
 
+            # Start TLS
             server.starttls()
 
             # Login using Gmail App Password
@@ -145,21 +154,21 @@ Message:
             # Send email
             server.send_message(msg)
 
-            # Close SMTP connection
-            server.quit()
+            print("EMAIL SENT SUCCESSFULLY")
 
             return Response(
                 {
-                    "message": "Message sent successfully."
+                    "message": "Message sent successfully.",
+                    "id": contact.id,
                 },
                 status=status.HTTP_201_CREATED,
             )
 
         except Exception as e:
-            print("EMAIL ERROR:", str(e))
+            print("EMAIL ERROR:", repr(e))
 
             # Contact is already saved in database.
-            # Email failure should not make the API fail.
+            # Email failure should NOT make API return 500.
             return Response(
                 {
                     "message": "Message saved, but email could not be sent.",
@@ -168,24 +177,13 @@ Message:
                 status=status.HTTP_201_CREATED,
             )
 
-
-# class ContactCreateView(generics.CreateAPIView):
-#     queryset = Contact.objects.all()
-#     serializer_class = ContactSerializer
-
-#     def create(self, request, *args, **kwargs):
-#         serializer = self.get_serializer(data=request.data)
-#         serializer.is_valid(raise_exception=True)
-
-#         contact = serializer.save()
-
-#         return Response(
-#             {
-#                 "message": "Contact saved successfully.",
-#                 "id": contact.id,
-#             },
-#             status=status.HTTP_201_CREATED,
-#         )
+        finally:
+            # Safely close SMTP connection
+            if server is not None:
+                try:
+                    server.quit()
+                except Exception:
+                    pass
 
 # Skills API
 class SkillListView(generics.ListAPIView):
