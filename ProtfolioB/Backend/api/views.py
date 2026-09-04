@@ -1,12 +1,10 @@
 import smtplib
-
 from email.message import EmailMessage
 
 from django.conf import settings
-
 from rest_framework import generics, status, viewsets
-
 from rest_framework.response import Response
+
 
 from .models import (
     About,
@@ -188,6 +186,7 @@ Message:
 #             },
 #             status=status.HTTP_201_CREATED,
 #         )
+
 # Skills API
 class SkillListView(generics.ListAPIView):
     queryset = Skill.objects.all()
